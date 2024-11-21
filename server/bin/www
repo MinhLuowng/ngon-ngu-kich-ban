@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+
+const app = require('../app'); // Nhập ứng dụng Express từ app.js
+var debug = require('debug')('chat-bot:server');
+const http = require('http'); // Sử dụng module HTTP để tạo server
+
+// Hàm normalizePort
+function normalizePort(val) {
+  const port = parseInt(val, 10);
+  if (isNaN(port)) return val; // Nếu không phải là số, trả về giá trị ban đầu
+  if (port >= 0) return port; // Nếu là số dương, trả về số đó
+  return false; // Nếu là số âm, trả về false
+}
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+const server = http.createServer(app);
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+// Chức năng xử lý lỗi
+function onError(error) {
+  if (error.syscall !== 'listen') throw error;
+  const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges.');
+      process.exit(1);
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use.');
+      process.exit(1);
+    default:
+      throw error;
+  }
+}
+
+// Chức năng xử lý khi server bắt đầu lắng nghe
+function onListening() {
+  const addr = server.address();
+  const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
